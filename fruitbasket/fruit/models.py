@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Fruit(models.Model):
@@ -12,12 +13,14 @@ class Fruit(models.Model):
     stock = models.BooleanField()
     min_available = models.IntegerField()
     max_available = models.IntegerField()
+    # TODO: ADD IMAGE (may be recordable image path)
 
     def __str__(self):
         return self.name
 
 
-class Product(models.Model):
+class Order(models.Model):
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)
     name = models.ForeignKey(
         to="fruit.Fruit",
         to_field="name",
@@ -28,3 +31,4 @@ class Product(models.Model):
         db_column="name",
     )
     amount = models.IntegerField()  ## TODO: must be in range min~max available
+    state = models.BooleanField()
