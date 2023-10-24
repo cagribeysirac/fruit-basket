@@ -21,19 +21,20 @@ class Fruit(models.Model):
         return self.name
 
 
-class Order(models.Model):
+class Item(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.ForeignKey(
         to="fruit.Fruit",
         to_field="name",
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
         blank=False,
         null=False,
         related_name="customer",
         db_column="name",
     )
     amount = models.IntegerField()  ## TODO: must be in range min~max available
-    state = models.BooleanField()
+    ordered = models.BooleanField()
+    action_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.customer} | {self.amount} | {self.name}"
+        return f"{self.customer} | {self.amount} | {self.name} | {self.ordered}"
