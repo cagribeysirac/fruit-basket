@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from fruit.models import Fruit
+from fruit.models import Fruit, Item
 
 
 class FruitSerializer(serializers.Serializer):
@@ -31,5 +31,22 @@ class FruitSerializer(serializers.Serializer):
             "max_available", instance.max_available
         )
         instance.save()
+        return instance
 
+
+class ItemSerializer(serializers.Serializer):
+    customer = serializers.PrimaryKeyRelatedField(read_only=True)
+    name = serializers.StringRelatedField()
+    amount = serializers.IntegerField()  ## TODO: must be in range min~max available
+    ordered = serializers.BooleanField()
+    action_time = serializers.DateTimeField(read_only=True)
+
+    def create(self, validated_data):
+        return Item.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
+        instance.amount = validated_data.get("amount", instance.amount)
+        instance.ordered = validated_data.get("ordered", instance.ordered)
+        instance.save()
         return instance
