@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from fruit.models import Fruit, Item
 
 
@@ -6,7 +7,9 @@ class FruitSerializer(serializers.Serializer):
     FruitType = (("0", "MEYVE"), ("1", "SEBZE"), ("2", "YESILLIK"))
 
     id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(max_length=20)
+    name = serializers.CharField(
+        max_length=20, validators=[UniqueValidator(queryset=Fruit.objects.all())]
+    )
     type = serializers.ChoiceField(choices=FruitType)
     stock = serializers.BooleanField()
     min_available = serializers.IntegerField()
