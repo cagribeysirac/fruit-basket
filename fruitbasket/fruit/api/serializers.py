@@ -3,14 +3,11 @@ from fruit.models import Fruit, Item
 
 
 class FruitSerializer(serializers.Serializer):
-    class FruitType(serializers.ChoiceField):
-        MEYVE = 0
-        SEBZE = 1
-        YESILLIK = 2
+    FruitType = (("0", "MEYVE"), ("1", "SEBZE"), ("2", "YESILLIK"))
 
     id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(unique=True, blank=False, null=False, max_length=20)
-    type = serializers.IntegerField(choices=FruitType.choices)
+    name = serializers.CharField(max_length=20)
+    type = serializers.ChoiceField(choices=FruitType)
     stock = serializers.BooleanField()
     min_available = serializers.IntegerField()
     max_available = serializers.IntegerField()
