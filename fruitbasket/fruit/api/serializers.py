@@ -33,11 +33,18 @@ class FruitSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+    def validate_min_available(self, value):  # Field level validation
+        if value < 0:
+            raise serializers.ValidationError(
+                "Lütfen kabul edilebilecek minimum sipariş miktarını pozitif tam sayı giriniz."
+            )
+        return value
+
 
 class ItemSerializer(serializers.Serializer):
     customer = serializers.PrimaryKeyRelatedField(read_only=True)
     name = serializers.StringRelatedField()
-    amount = serializers.IntegerField()  ## TODO: must be in range min~max available
+    amount = serializers.IntegerField()
     ordered = serializers.BooleanField()
     action_time = serializers.DateTimeField(read_only=True)
 
@@ -50,3 +57,11 @@ class ItemSerializer(serializers.Serializer):
         instance.ordered = validated_data.get("ordered", instance.ordered)
         instance.save()
         return instance
+
+    def validate(self, data):  # Object level validation
+        fruit = Fruit.objects.get(name=data["name"])
+        if data["amount"] < fruit.min_available or data["amount"] > fruit.max_available:
+            raise serializers.ValidationError(
+                f"{fruit.name} ürününden {data['amount']} miktarında sipariş edilemez. Sipariş miktarı {fruit.min_available}~{fruit.max_available} aralığında olmalıdır."
+            )
+        return data
